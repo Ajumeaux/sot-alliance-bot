@@ -11,13 +11,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Où chercher les modules find_*.cmake (FindDPP.cmake)
+# Where to look for find_*.cmake modules (FindDPP.cmake)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # === DPP ===
 find_package(DPP REQUIRED)
 
-# === ODB / base de données ===
+# === ODB / database ===
 
 set(ODB_GENERATED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/generated")
 
@@ -39,7 +39,7 @@ target_link_libraries(db
         pq
 )
 
-# includes exportés par la lib db (visibles aussi par l'exécutable)
+# Include dirs exported by the db library (also visible to the executable)
 target_include_directories(db
     PUBLIC
         "${ODB_GENERATED_DIR}"
@@ -47,7 +47,7 @@ target_include_directories(db
         "${CMAKE_CURRENT_SOURCE_DIR}/include/model"
 )
 
-# === Exécutable du bot ===
+# === Bot executable ===
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
@@ -72,7 +72,7 @@ add_executable(${PROJECT_NAME}
     src/bot/ui/EndAllianceUI.cpp
 )
 
-# includes spécifiques à l'exécutable (en plus de ceux hérités via db)
+# Executable-specific include dirs (in addition to those inherited via db)
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -82,7 +82,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        ${DPP_LIBRARIES}          # ou DPP::DPP selon ton FindDPP
+        ${DPP_LIBRARIES}          # or DPP::DPP depending on your FindDPP
         "-Wl,--whole-archive"
         db
         "-Wl,--no-whole-archive"
