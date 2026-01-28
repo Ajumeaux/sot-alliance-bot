@@ -1,0 +1,22 @@
+#pragma once
+
+#include <memory>
+#include <dpp/dpp.h>
+
+#include "bot/commands/ISlashCommand.hpp"
+
+namespace odb { namespace pgsql { class database; } }
+
+class CancelAllianceCommand : public ISlashCommand {
+public:
+    std::string subcommand_name() const override {
+        return "annuler";
+    }
+
+    std::string description() const override {
+        return "Annuler une alliance planifiée";
+    }
+
+    void handle(const dpp::slashcommand_t& event,
+                const std::shared_ptr<odb::pgsql::database>& db) const override;
+};

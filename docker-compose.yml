@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16
+    container_name: discord_bot_db
+    environment:
+      POSTGRES_USER: botuser
+      POSTGRES_PASSWORD: botpassword
+      POSTGRES_DB: botdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U botuser -d botdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  bot:
+    build: .
+    container_name: discord_bot
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DISCORD_TOKEN: "${DISCORD_TOKEN}"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: botuser
+      DB_PASSWORD: botpassword
+      DB_NAME: botdb
+      TZ: "Europe/Paris"
+    restart: unless-stopped
+
+volumes:
+  db_data:
