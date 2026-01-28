@@ -1,9 +1,9 @@
-# === STAGE 1 : build ===
+# === STAGE 1: build ===
 FROM ubuntu:22.04 AS build
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Outils de build + ODB + Postgres headers
+# Build tools + ODB + Postgres headers
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y \
     libodb-dev \
     libodb-pgsql-dev \
     odb \
-    gcc-10 g++-10 \ 
+    gcc-10 g++-10 \
     && rm -rf /var/lib/apt/lists/*
 
-# Installer DPP (lib + headers)
+# Install DPP (library + headers)
 RUN wget -O /tmp/dpp.deb https://dl.dpp.dev/ \
  && apt-get update \
  && apt-get install -y /tmp/dpp.deb \
@@ -24,10 +24,10 @@ RUN wget -O /tmp/dpp.deb https://dl.dpp.dev/ \
 
 WORKDIR /app
 
-# On copie tout le projet
+# Copy the whole project
 COPY . .
 
-# === Génération des fichiers ODB dans /app/generated ===
+# === Generate ODB files into /app/generated ===
 RUN mkdir -p generated && \
     odb -d pgsql \
         --std c++11 \
@@ -43,12 +43,11 @@ RUN mkdir -p generated && \
         include/model/bot_settings.hxx \
         include/model/alliance_discord_objects.hxx
 
-
-# === Build CMake ===
+# === CMake build ===
 RUN cmake -B build -DCMAKE_BUILD_TYPE=Release \
  && cmake --build build -j"$(nproc)"
 
-# === STAGE 2 : runtime ===
+# === STAGE 2: runtime ===
 FROM ubuntu:22.04 AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -70,7 +69,7 @@ RUN wget -O /tmp/dpp.deb https://dl.dpp.dev/ \
 
 WORKDIR /app
 
-# On ne copie que le binaire compilé
+# Only copy the compiled binary
 COPY --from=build /app/build/discord-bot /usr/local/bin/discord-bot
 
 ENTRYPOINT ["/usr/local/bin/discord-bot"]
